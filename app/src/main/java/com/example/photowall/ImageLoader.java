@@ -190,7 +190,8 @@ public class ImageLoader {
         Log.d(TAG,"DISKCache");
         Bitmap bitmap=null;
         String imageFileName=DiskFile.toString()+File.separator+getMD5(url)+".png";
-        bitmap= BitmapFactory.decodeFile(imageFileName);
+        File file=new File(imageFileName);
+        if(file.exists()) bitmap= BitmapFactory.decodeFile(imageFileName);
         if(bitmap!=null) saveToMemoryCache(url,bitmap);
         return bitmap;
     }

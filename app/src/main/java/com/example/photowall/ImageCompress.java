@@ -26,7 +26,7 @@ public class ImageCompress {
         BitmapFactory.decodeResource(res,resId,options);
         options.inSampleSize=CalculateInsampleSize(options,reqWidth,reqHeight);
         options.inJustDecodeBounds=false;
-        return BitmapFactory.decodeResource(res,resId,options);
+        return BitmapFactory.decodeResource(res,resId,options);//转换成位图
     }
 
     public Bitmap decodeSampledBitmapFromFileDescriptor(FileDescriptor fileDescriptor, int reqWidth, int reqHeight)
