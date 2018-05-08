@@ -4,6 +4,7 @@ import android.content.Context;
 import android.provider.ContactsContract;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
     @Override
     public void onBindViewHolder(RecyclerviewAdapter.ViewHolder holder, int position) {
+        Log.d("onBindView", "onBindViewHolder:onbindview启动了 "+Photos[position]);
         imageLoader.bindBitmap(Photos[position],holder.imageView,holder.imageView.getWidth(),holder.itemView.getHeight());
     }
 

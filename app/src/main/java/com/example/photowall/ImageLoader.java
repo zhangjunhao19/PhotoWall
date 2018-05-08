@@ -48,7 +48,7 @@ public class ImageLoader {
     private static final long DISK_CACHE_SIZE=1024*1024*50;//最大缓存为50MB(因为内存的基本单位是b)
     private static final int IO_BUFFER_SIZE =8*1024;//流内最大缓存量
     private static final int DISK_CACHE_INDEX=0;//缓存指针
-    private boolean mIsDiskLruCacheCreated=false;//默认不打开磁盘存储
+
     private static final ThreadFactory sThreadFactory=new ThreadFactory() {//为后面线程池做准备
         private final AtomicInteger mcount=new AtomicInteger(1);//原子操作Integer,线程安全的Integer类
         @Override
@@ -197,6 +197,8 @@ public class ImageLoader {
     }
     private Bitmap loadBitmapFormHttp(String urll,int reqWidth,int reqHeight)
     {
+        Log.d(TAG, "loadBitmapFormHttp: 难受呀马飞"+urll);
+        Log.d(TAG, "loadBitmapFormHttp: 从网络下载");
         ImageCompress imageCompress=new ImageCompress();
        if(Looper.myLooper()==Looper.getMainLooper()){
          throw new RuntimeException("网络操作不能在UI线程上操作");
@@ -205,13 +207,12 @@ public class ImageLoader {
         HttpURLConnection urlConnection=null;
         InputStream inputStream=null;
         try{
-            final URL url=new URL(urll);
+             URL url=new URL(urll);
             urlConnection=(HttpURLConnection)url.openConnection();
-            urlConnection.setDoInput(true);
-            urlConnection.connect();
             inputStream=urlConnection.getInputStream();
             bitmap=imageCompress.decodeSampledBitmapFromStream(inputStream,reqWidth,reqHeight);
-           if(bitmap!=null) saveToDisk(urll,inputStream,reqWidth,reqHeight);
+            Log.d(TAG, "loadBitmapFormHttp: bitmap"+bitmap);
+            if(bitmap!=null) saveToDisk(urll,inputStream,reqWidth,reqHeight);
         }catch (final IOException e)
         {
             Log.e(TAG,"下图片的时候出现错误");
@@ -245,12 +246,11 @@ public class ImageLoader {
 
 
     public void saveToDisk(String imageurl, InputStream inputStream,int reqWidth,int reqHeight)//缓存到本地
-    {
+    {   long x=0;
         String imageFileName=DiskFile.toString()+File.separator+getMD5(imageurl)+".jpg";//.separator就是/或者\增加鲁棒性
+        Log.d(TAG, "saveToDisk: 调用了saveToDisk，切文件名为"+imageFileName);
         File file=new File(imageFileName);
         File[] files=DiskFile.listFiles();
-        long x=files.length;
-        if(x>DISK_CACHE_SIZE)clear();
         try {
             FileOutputStream fo=new FileOutputStream(file);
             Bitmap bitmap=mImageCompress.decodeSampledBitmapFromStream(inputStream,reqWidth,reqHeight);
