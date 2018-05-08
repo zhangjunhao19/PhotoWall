@@ -1,6 +1,7 @@
 package com.example.photowall;
 
 import android.content.Context;
+import android.provider.ContactsContract;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,6 +15,12 @@ import com.example.photowall.R;
 
 public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapter.ViewHolder>{
    private Context mContext;
+   private String[] Photos;
+   private ImageLoader imageLoader;
+   public RecyclerviewAdapter(Context context,String[] Photos ){
+       this.Photos=Photos;
+        imageLoader=ImageLoader.build(context);
+   }
     @Override
     public RecyclerviewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if(mContext==null)mContext=parent.getContext();
@@ -23,12 +30,12 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
     @Override
     public void onBindViewHolder(RecyclerviewAdapter.ViewHolder holder, int position) {
-
+        imageLoader.bindBitmap(Photos[position],holder.imageView,holder.imageView.getWidth(),holder.itemView.getHeight());
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return Photos.length;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
