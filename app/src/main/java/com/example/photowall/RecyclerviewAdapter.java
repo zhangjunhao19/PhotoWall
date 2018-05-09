@@ -10,15 +10,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.example.photowall.R;
+
+import java.util.List;
+
 /**
  * Created by 67698 on 2018/5/7.
  */
 
 public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapter.ViewHolder>{
    private Context mContext;
-   private String[] Photos;
+   private List<String> Photos;
    private ImageLoader imageLoader;
-   public RecyclerviewAdapter(Context context,String[] Photos ){
+   public RecyclerviewAdapter(Context context,List<String> Photos ){
        this.Photos=Photos;
         imageLoader=ImageLoader.build(context);
    }
@@ -31,13 +34,13 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
     @Override
     public void onBindViewHolder(RecyclerviewAdapter.ViewHolder holder, int position) {
-        Log.d("onBindView", "onBindViewHolder:onbindview启动了 "+Photos[position]);
-        imageLoader.bindBitmap(Photos[position],holder.imageView,holder.imageView.getWidth(),holder.itemView.getHeight());
+        Log.d("onBindView", "onBindViewHolder:onbindview启动了 "+Photos.get(position));
+        imageLoader.bindBitmap(Photos.get(position),holder.imageView,holder.imageView.getWidth(),holder.itemView.getHeight());
     }
 
     @Override
     public int getItemCount() {
-        return Photos.length;
+        return Photos.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

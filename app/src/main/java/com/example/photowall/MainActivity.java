@@ -4,9 +4,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private String[] Photo={"https://ws1.sinaimg.cn/large/610dc034ly1fp9qm6nv50j20u00miacg.jpg",
+    /*private String[] Photo={"https://ws1.sinaimg.cn/large/610dc034ly1fp9qm6nv50j20u00miacg.jpg",
             "https://ws1.sinaimg.cn/large/610dc034ly1foowtrkpvkj20sg0izdkx.jpg",
             "http://7xi8d6.com1.z0.glb.clouddn.com/20171227115959_lmlLZ3_Screenshot.jpeg",
             "http://7xi8d6.com1.z0.glb.clouddn.com/20171206084331_wylXWG_misafighting_6_12_2017_8_43_16_390.jpeg",
@@ -14,17 +24,63 @@ public class MainActivity extends AppCompatActivity {
             "http://7xi8d6.com1.z0.glb.clouddn.com/2017-11-17-22794158_128707347832045_9158114204975104000_n.jpg",
             "https://ws1.sinaimg.cn/large/610dc034ly1fgi3vd6irmj20u011i439.jpg",
             "http://7xi8d6.com1.z0.glb.clouddn.com/20171102092251_AY0l4b_alrisaa_2_11_2017_9_22_44_335.jpeg"
-    };
+    };*/
+    private List<String> Photos=new ArrayList<>();
     private RecyclerviewAdapter recyclerviewAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
+        getPhoto();
+    }
+    private void initview()
+    {
         RecyclerView recyclerView=findViewById(R.id.recyclerview);
         GridLayoutManager gridLayoutManager=new GridLayoutManager(this,2);
         recyclerView.setLayoutManager(gridLayoutManager);
-        recyclerviewAdapter=new RecyclerviewAdapter(this,Photo);
+        recyclerviewAdapter=new RecyclerviewAdapter(this,Photos);
         recyclerView.setAdapter(recyclerviewAdapter);
     }
+    private void getPhoto()
+    {
+        Http http=new Http("http://gank.io/api/data/%E7%A6%8F%E5%88%A9/0/0");
+        Log.d("getPhoto", "finish: 启动了getPhoto");
+        http.sendRequestWithHttpURLConnection(new Http.Callback() {
+            @Override
+            public void finish(String respone) {
+                Gson gson=new Gson();
+                Jsonbean jsonbean=gson.fromJson(respone,Jsonbean.class);
+                for(int i=0;i<jsonbean.getResult().length;i++)
+                {
+                    Photos.add(jsonbean.getResult()[i].getUrl());
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        initview();
+                    }
+                });
+            }
+
+        });
+    }
+   /*private void parseJSON(String respone){
+        try {
+
+            JSONArray jsonArray=new JSONArray(respone);
+            Log.d("parseJson", "parseJSON:启动了parseJson ,json数组长"+jsonArray.length());
+            for(int i=0;i<jsonArray.length();i++)
+            {
+                JSONObject jsonObject=jsonArray.getJSONObject(i);
+                Log.d("难受呀嘤嘤毛", "parseJSON: "+jsonObject.getString("url"));
+                Photos.add(jsonObject.getString("url"));
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }*/
+
 }

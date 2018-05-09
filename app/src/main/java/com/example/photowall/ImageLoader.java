@@ -197,8 +197,6 @@ public class ImageLoader {
     }
     private Bitmap loadBitmapFormHttp(String urll,int reqWidth,int reqHeight)
     {
-        Log.d(TAG, "loadBitmapFormHttp: 难受呀马飞"+urll);
-        Log.d(TAG, "loadBitmapFormHttp: 从网络下载");
         ImageCompress imageCompress=new ImageCompress();
        if(Looper.myLooper()==Looper.getMainLooper()){
          throw new RuntimeException("网络操作不能在UI线程上操作");
@@ -248,7 +246,7 @@ public class ImageLoader {
     public void saveToDisk(String imageurl, InputStream inputStream,int reqWidth,int reqHeight)//缓存到本地
     {   long x=0;
         String imageFileName=DiskFile.toString()+File.separator+getMD5(imageurl)+".jpg";//.separator就是/或者\增加鲁棒性
-        Log.d(TAG, "saveToDisk: 调用了saveToDisk，切文件名为"+imageFileName);
+        //Log.d(TAG, "saveToDisk: 调用了saveToDisk，切文件名为"+imageFileName);
         File file=new File(imageFileName);
         File[] files=DiskFile.listFiles();
         try {
