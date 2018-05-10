@@ -89,14 +89,16 @@ public class ImageLoader {
         };
         DiskFile=BuildDiskFile(context);
     }
-    private static File BuildDiskFile(Context context)//获取文件
+    private static File BuildDiskFile(Context context)//创立文件夹
     {
+
         File diskfile=null;
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
             diskfile=new File(new File(Environment.getExternalStorageDirectory(),context.getPackageName()),"Cache");
             if (!diskfile.exists()) {
-                diskfile.mkdir();
+                diskfile.mkdirs();//建立文件夹
             }
+
         }
         if(diskfile==null)
         {
@@ -181,7 +183,8 @@ public class ImageLoader {
 
     private Bitmap loadBitmapFromMemCache(String url)
     {   Log.d(TAG,"MemCache");
-        Bitmap bitmap=getBitmapFromMemoryCache(getMD5(url));
+        Bitmap bitmap=getBitmapFromMemoryCache(url);
+        Log.d(TAG, "loadBitmapFromMemCache: 此时的bitmap "+bitmap);
         if(bitmap!=null)return bitmap;
         else return null;
     }
@@ -210,7 +213,11 @@ public class ImageLoader {
             inputStream=urlConnection.getInputStream();
             bitmap=imageCompress.decodeSampledBitmapFromStream(inputStream,reqWidth,reqHeight);
             Log.d(TAG, "loadBitmapFormHttp: bitmap"+bitmap);
-            if(bitmap!=null) saveToDisk(urll,inputStream,reqWidth,reqHeight);
+            if(bitmap!=null) {
+                saveToDisk(urll, inputStream, reqWidth, reqHeight);
+               // Log.d(TAG, "loadBitmapFormHttp: 此时的key为 "+urll+"此时的bitmap为 "+bitmap);
+                saveToMemoryCache(urll,bitmap);
+            }
         }catch (final IOException e)
         {
             Log.e(TAG,"下图片的时候出现错误");
@@ -231,9 +238,9 @@ public class ImageLoader {
 
     private void saveToMemoryCache(String key,Bitmap bitmap)
     {
-        if(getBitmapFromMemoryCache(key)==null)
+        if(getBitmapFromMemoryCache(key)==null&&bitmap!=null&&key!=null)
         {
-            Log.d(TAG, "saveToMemoryCache: key="+key);
+            Log.d(TAG, "saveToMemoryCache: key="+key+"bitmap为"+bitmap);
             mMemoryCache.put(key,bitmap);
         }
     }
@@ -244,11 +251,12 @@ public class ImageLoader {
 
 
     public void saveToDisk(String imageurl, InputStream inputStream,int reqWidth,int reqHeight)//缓存到本地
-    {   long x=0;
-        String imageFileName=DiskFile.toString()+File.separator+getMD5(imageurl)+".jpg";//.separator就是/或者\增加鲁棒性
-        //Log.d(TAG, "saveToDisk: 调用了saveToDisk，切文件名为"+imageFileName);
+    {
+        String imageFileName=DiskFile.toString()+File.separator+getMD5(imageurl)+".png";//.separator就是/或者\增加鲁棒性
+        Log.d(TAG, "saveToDisk: 调用了saveToDisk，切文件名为"+imageFileName);
         File file=new File(imageFileName);
-        File[] files=DiskFile.listFiles();
+        if(!file.exists())file.mkdir();
+        if(file.exists()) Log.d(TAG, "saveToDisk: 文件已存在");
         try {
             FileOutputStream fo=new FileOutputStream(file);
             Bitmap bitmap=mImageCompress.decodeSampledBitmapFromStream(inputStream,reqWidth,reqHeight);
