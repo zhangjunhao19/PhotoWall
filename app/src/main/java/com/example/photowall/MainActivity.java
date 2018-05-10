@@ -6,7 +6,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.google.gson.Gson;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,16 +49,10 @@ public class MainActivity extends AppCompatActivity {
         http.sendRequestWithHttpURLConnection(new Http.Callback() {
             @Override
             public void finish(String respone) {
-              /*  Gson gson=new Gson();
-               // Log.d("难受呀马飞", "gson解析为 "+gson.fromJson(respone,Jsonbean.class));
-                Jsonbean jsonbean=gson.fromJson(respone,Jsonbean.class);
-                for(int i=0;i<jsonbean.getResults().length;i++)
-                {
-                    Photos.add(jsonbean.getResults()[i].getUrl());
-                }*/
                 parseJSON(respone);
 
-               runOnUiThread(new Runnable() {
+              runOnUiThread(new Runnable() {
+
                     @Override
                     public void run() {
                         initview();
