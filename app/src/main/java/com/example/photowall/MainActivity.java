@@ -49,13 +49,16 @@ public class MainActivity extends AppCompatActivity {
         http.sendRequestWithHttpURLConnection(new Http.Callback() {
             @Override
             public void finish(String respone) {
-                Gson gson=new Gson();
+              /*  Gson gson=new Gson();
+               // Log.d("难受呀马飞", "gson解析为 "+gson.fromJson(respone,Jsonbean.class));
                 Jsonbean jsonbean=gson.fromJson(respone,Jsonbean.class);
-                for(int i=0;i<jsonbean.getResult().length;i++)
+                for(int i=0;i<jsonbean.getResults().length;i++)
                 {
-                    Photos.add(jsonbean.getResult()[i].getUrl());
-                }
-                runOnUiThread(new Runnable() {
+                    Photos.add(jsonbean.getResults()[i].getUrl());
+                }*/
+                parseJSON(respone);
+
+               runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         initview();
@@ -65,22 +68,22 @@ public class MainActivity extends AppCompatActivity {
 
         });
     }
-   /*private void parseJSON(String respone){
-        try {
+   private void parseJSON(String respone) {
+       try {
+           JSONObject jsonObject=new JSONObject(respone);
+           String result=jsonObject.getString("results");
+           JSONArray jsonArray=new JSONArray(result);
 
-            JSONArray jsonArray=new JSONArray(respone);
-            Log.d("parseJson", "parseJSON:启动了parseJson ,json数组长"+jsonArray.length());
-            for(int i=0;i<jsonArray.length();i++)
-            {
-                JSONObject jsonObject=jsonArray.getJSONObject(i);
-                Log.d("难受呀嘤嘤毛", "parseJSON: "+jsonObject.getString("url"));
-                Photos.add(jsonObject.getString("url"));
+           Log.d("parseJson", "parseJSON:启动了parseJson ,json数组长" + jsonArray.length());
+           for (int i = 0; i < jsonArray.length(); i++) {
+               JSONObject jsonObject1 = jsonArray.getJSONObject(i);
+               Log.d("难受呀嘤嘤毛", "parseJSON: " + jsonObject1.getString("url"));
+               Photos.add(jsonObject1.getString("url"));
 
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }*/
+           }
+       } catch (JSONException e) {
+           e.printStackTrace();
+       }
+   }
 
 }
