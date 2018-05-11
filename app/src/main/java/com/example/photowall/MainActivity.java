@@ -9,11 +9,13 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 
@@ -66,12 +68,22 @@ public class MainActivity extends AppCompatActivity {
     }
     private void initview()
     {
+        final Context context=this;
         Log.d("initview", "进行了初始化布局 ");
+        final ImageLoader imageLoader=ImageLoader.build(this);
         RecyclerView recyclerView=findViewById(R.id.recyclerview);
         GridLayoutManager gridLayoutManager=new GridLayoutManager(this,2);
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerviewAdapter=new RecyclerviewAdapter(this,Photos);
         recyclerView.setAdapter(recyclerviewAdapter);
+        FloatingActionButton floatingActionButton=findViewById(R.id.fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageLoader.clear();
+                Toast.makeText(context,"清理缓存成功",Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     public boolean isNetworkConnected(Context context) {
             if (context != null) {
@@ -90,8 +102,15 @@ public class MainActivity extends AppCompatActivity {
         http.sendRequestWithHttpURLConnection(new Http.Callback() {
             @Override
             public void finish(String respone) {
-                if(isNetworkConnected(context)) parseJSON(respone);
-                else Photos=getArrayList();
+                if(isNetworkConnected(context)){
+                    Log.d("finish", "网络连接成功 ");
+                    parseJSON(respone);
+                }
+                else {
+                    Photos=getArrayList();
+                    Log.d("finish", "网络连接不成功 Photo");
+                    if(Photos.size()!=0) Log.d("nullHttp", "此时的Photos不为空 ");
+                }
               runOnUiThread(new Runnable() {
 
                     @Override
@@ -124,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public List getArrayList()
     {
+        Log.d("getArrayList", "得到数组 ");
         ObjectInputStream objectInputStream;
         FileInputStream fileInputStream;
          List<String>list =new ArrayList<>();
@@ -142,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void saveArrayList(List<String> arrayList)
     {
+        Log.d("saveArrayList", "保存数组 "+arrayList.size());
         FileOutputStream fileOutputStream=null;
         ObjectOutputStream objectOutputStream=null;
         try {
@@ -163,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if(file.exists()) Log.d("getFile", "文件创建成功 ");
         return file;
     }
     public static boolean isGrantExternalRW(Activity activity) {
@@ -189,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
                Photos.add(jsonObject1.getString("url"));
 
            }
+          // Log.d("parseJSON", "此时的Photo大小为 "+Photos.size());
            saveArrayList(Photos);
        } catch (JSONException e) {
            e.printStackTrace();
