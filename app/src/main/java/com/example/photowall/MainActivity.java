@@ -4,7 +4,10 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +22,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
             "https://ws1.sinaimg.cn/large/610dc034ly1fgi3vd6irmj20u011i439.jpg",
             "http://7xi8d6.com1.z0.glb.clouddn.com/20171102092251_AY0l4b_alrisaa_2_11_2017_9_22_44_335.jpeg"
     };*/
+    private File totalFile;
     private List<String> Photos=new ArrayList<>();
     private RecyclerviewAdapter recyclerviewAdapter;
 
@@ -50,26 +60,38 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         if(isGrantExternalRW(this))Toast.makeText(this,"权限申请成功",Toast.LENGTH_SHORT).show();
         else Toast.makeText(this,"权限申请不成功，无法进行本地缓存",Toast.LENGTH_SHORT).show();
-        getPhoto();
+        totalFile=getFile(this);
+         getPhoto(this);
 
     }
     private void initview()
     {
+        Log.d("initview", "进行了初始化布局 ");
         RecyclerView recyclerView=findViewById(R.id.recyclerview);
         GridLayoutManager gridLayoutManager=new GridLayoutManager(this,2);
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerviewAdapter=new RecyclerviewAdapter(this,Photos);
         recyclerView.setAdapter(recyclerviewAdapter);
     }
-    private void getPhoto()
-    {
+    public boolean isNetworkConnected(Context context) {
+            if (context != null) {
+                ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+                if (mNetworkInfo != null) {
+                    return mNetworkInfo.isAvailable();
+                         }
+                 }
+             return false;
+         }
+    private void getPhoto(final Context context) {
+
         Http http=new Http("http://gank.io/api/data/%E7%A6%8F%E5%88%A9/0/0");
         Log.d("getPhoto", "finish: 启动了getPhoto");
         http.sendRequestWithHttpURLConnection(new Http.Callback() {
             @Override
             public void finish(String respone) {
-                parseJSON(respone);
-
+                if(isNetworkConnected(context)) parseJSON(respone);
+                else Photos=getArrayList();
               runOnUiThread(new Runnable() {
 
                     @Override
@@ -79,7 +101,69 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
 
+            @Override
+            public void backnull() {
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        initview();
+                    }
+                });
+
+            }
+
         });
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                initview();
+            }
+        });
+    }
+    public List getArrayList()
+    {
+        ObjectInputStream objectInputStream;
+        FileInputStream fileInputStream;
+         List<String>list =new ArrayList<>();
+        try {
+            fileInputStream=new FileInputStream(totalFile.toString());
+            objectInputStream=new ObjectInputStream(fileInputStream);
+            list= (List<String>) objectInputStream.readObject();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    public void saveArrayList(List<String> arrayList)
+    {
+        FileOutputStream fileOutputStream=null;
+        ObjectOutputStream objectOutputStream=null;
+        try {
+            fileOutputStream=new FileOutputStream(totalFile.toString());
+            objectOutputStream=new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(arrayList);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    public static File getFile(Context context)
+    {
+        File file=new File(new File(Environment.getExternalStorageDirectory(),context.getPackageName()),"ChunchuList");
+        if(!file.exists()) try {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file;
     }
     public static boolean isGrantExternalRW(Activity activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && activity.checkSelfPermission(
@@ -98,13 +182,14 @@ public class MainActivity extends AppCompatActivity {
            String result=jsonObject.getString("results");
            JSONArray jsonArray=new JSONArray(result);
 
-           Log.d("parseJson", "parseJSON:启动了parseJson ,json数组长" + jsonArray.length());
+           //Log.d("parseJson", "parseJSON:启动了parseJson ,json数组长" + jsonArray.length());
            for (int i = 0; i < jsonArray.length(); i++) {
                JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-               Log.d("难受呀嘤嘤毛", "parseJSON: " + jsonObject1.getString("url"));
+               //Log.d("难受呀嘤嘤毛", "parseJSON: " + jsonObject1.getString("url"));
                Photos.add(jsonObject1.getString("url"));
 
            }
+           saveArrayList(Photos);
        } catch (JSONException e) {
            e.printStackTrace();
        }

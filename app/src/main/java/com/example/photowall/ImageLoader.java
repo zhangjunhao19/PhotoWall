@@ -96,8 +96,9 @@ public class ImageLoader {
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
             diskfile=new File(new File(Environment.getExternalStorageDirectory(),context.getPackageName()),"Cache");
             if (!diskfile.exists()) {
-                diskfile.mkdirs();//建立文件夹
+                diskfile.mkdir();//建立文件夹
             }
+            if(diskfile.exists()) Log.d(TAG, "BuildDiskFile: 文件夹创建成功");
 
         }
         if(diskfile==null)
@@ -214,7 +215,7 @@ public class ImageLoader {
             bitmap=imageCompress.decodeSampledBitmapFromStream(inputStream,reqWidth,reqHeight);
             Log.d(TAG, "loadBitmapFormHttp: bitmap"+bitmap);
             if(bitmap!=null) {
-                saveToDisk(urll, inputStream, reqWidth, reqHeight);
+                saveToDisk(urll, bitmap);
                // Log.d(TAG, "loadBitmapFormHttp: 此时的key为 "+urll+"此时的bitmap为 "+bitmap);
                 saveToMemoryCache(urll,bitmap);
             }
@@ -250,17 +251,31 @@ public class ImageLoader {
     }
 
 
-    public void saveToDisk(String imageurl, InputStream inputStream,int reqWidth,int reqHeight)//缓存到本地
+    public void saveToDisk(String imageurl,Bitmap bitmap)//缓存到本地
     {
         String imageFileName=DiskFile.toString()+File.separator+getMD5(imageurl)+".png";//.separator就是/或者\增加鲁棒性
         Log.d(TAG, "saveToDisk: 调用了saveToDisk，切文件名为"+imageFileName);
         File file=new File(imageFileName);
-        if(!file.exists())file.mkdir();
-        if(file.exists()) Log.d(TAG, "saveToDisk: 文件已存在");
         try {
-            FileOutputStream fo=new FileOutputStream(file);
-            Bitmap bitmap=mImageCompress.decodeSampledBitmapFromStream(inputStream,reqWidth,reqHeight);
-           if(bitmap!=null) bitmap.compress(Bitmap.CompressFormat.PNG,100,fo);
+          if(file.exists()){
+              file.delete();
+              file.createNewFile();
+          }
+            if(file.exists()) Log.d(TAG, "saveToDisk: 文件已存在");
+            if(!file.isDirectory()) {
+                Log.d(TAG, "saveToDisk: 是文件");
+            }else
+                Log.d(TAG, "saveToDisk: 是文件夹");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            FileOutputStream fo=new FileOutputStream(imageFileName);
+            Log.d(TAG, "saveToDisk: 此时的bitmap为:"+bitmap);
+           if(bitmap!=null) {
+               bitmap.compress(Bitmap.CompressFormat.PNG, 100, fo);
+               Log.d(TAG, "saveToDisk: 保存成功");
+           }
             try {
                 fo.flush();
                 fo.close();
