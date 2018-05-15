@@ -59,6 +59,12 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                 imageLoader.bindBitmap(Photos.get(position),imageView,imageView.getWidth(),imageView.getHeight());
                 Toast.makeText(mContext,"这是position"+position,Toast.LENGTH_SHORT).show();
                 dialog.show();
+                imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
             }
         });
    }
