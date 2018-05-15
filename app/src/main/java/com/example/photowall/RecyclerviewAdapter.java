@@ -46,8 +46,6 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
         imageLoader.bindBitmap(Photos.get(position),holder.imageView,holder.imageView.getWidth(),holder.itemView.getHeight());
         dialog=new Dialog(mContext);
         dialog.setContentView(R.layout.dialog);
-        imageView =(ImageView) dialog.findViewById(R.id.large_image);
-        imageLoader.bindBitmap(Photos.get(position),imageView,imageView.getWidth(),imageView.getHeight());
         dialog.setCanceledOnTouchOutside(true);
         Window window=dialog.getWindow();
         WindowManager.LayoutParams layoutParams=window.getAttributes();
@@ -57,6 +55,9 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                imageView =(ImageView) dialog.findViewById(R.id.large_image);
+                imageLoader.bindBitmap(Photos.get(position),imageView,imageView.getWidth(),imageView.getHeight());
+                Toast.makeText(mContext,"这是position"+position,Toast.LENGTH_SHORT).show();
                 dialog.show();
             }
         });
