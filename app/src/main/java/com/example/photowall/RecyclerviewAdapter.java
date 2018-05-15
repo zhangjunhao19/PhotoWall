@@ -57,7 +57,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
             public void onClick(View v) {
                 imageView =(ImageView) dialog.findViewById(R.id.large_image);
                 imageLoader.bindBitmap(Photos.get(position),imageView,imageView.getWidth(),imageView.getHeight());
-                Toast.makeText(mContext,"这是position"+position,Toast.LENGTH_SHORT).show();
+               // Toast.makeText(mContext,"这是position"+position,Toast.LENGTH_SHORT).show();
                 dialog.show();
                 imageView.setOnClickListener(new View.OnClickListener() {
                     @Override
