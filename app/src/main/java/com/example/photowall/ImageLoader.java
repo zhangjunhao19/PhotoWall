@@ -92,20 +92,16 @@ public class ImageLoader {
     private static File BuildDiskFile(Context context)//创立文件夹
     {
 
-        File diskfile=null;
+        File file=null;
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-            diskfile=new File(new File(Environment.getExternalStorageDirectory(),context.getPackageName()),"Cache");
-            if (!diskfile.exists()) {
-                diskfile.mkdir();//建立文件夹
+            file=new File(new File(Environment.getExternalStorageDirectory(),context.getPackageName()),"Cache");
+            if (!file.exists()) {
+                file.mkdir();//建立文件夹
             }
-            if(diskfile.exists()) Log.d(TAG, "BuildDiskFile: 文件夹创建成功");
+            if(file.exists()) Log.d(TAG, "BuildDiskFile: 文件夹创建成功");
 
         }
-        if(diskfile==null)
-        {
-            diskfile=context.getCacheDir();
-        }
-        return diskfile;
+        return file;
     }
     private static String getMD5(String url){//MD5加密
         String rec=null;
@@ -171,6 +167,7 @@ public class ImageLoader {
         Runnable loadBitmapTask=new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "进行了异步下载图片 ");
             Bitmap bitmap=loadBitmap(url,reqWidth,reqHeight);
             if(bitmap!=null)
             {
