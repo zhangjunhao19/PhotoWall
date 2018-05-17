@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
              return false;
          }
     private void getPhoto(final Context context) {
-        Log.d("网络情况", "此时的网络连接情况是 "+isNetworkConnected(context));
+       // Log.d("网络情况", "此时的网络连接情况是 "+isNetworkConnected(context));
         if(isNetworkConnected(context)){
         Http http=new Http("http://gank.io/api/data/%E7%A6%8F%E5%88%A9/0/0");
         Log.d("getPhoto", "finish: 启动了getPhoto");
@@ -129,8 +129,9 @@ public class MainActivity extends AppCompatActivity {
             });
         }
         else {
+            Toast.makeText(context,"未连接网络",Toast.LENGTH_SHORT).show();
             Photos=getArrayList();
-            Log.d("finish", "网络连接不成功 Photo");
+            //Log.d("finish", "网络连接不成功 Photo");
             if(Photos.size()!=0) Log.d("nullHttp", "此时的Photos不为空 ");
         }
         runOnUiThread(new Runnable() {
@@ -148,9 +149,11 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences=getSharedPreferences("urldata",MODE_PRIVATE);
         for(int i=0;;i++)
         {
+           // Log.d("得到数据", "进行循环 ");
             if(sharedPreferences.getString(String.valueOf(i),"0")=="0")break;
             list.add(sharedPreferences.getString(String.valueOf(i),"0"));
         }
+        Log.d("得到数组", "此时数组的大小 "+list.size());
         return list;
     }
     public void saveArrayList(List<String> arrayList)
@@ -159,8 +162,12 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor=getSharedPreferences("urldata",MODE_PRIVATE).edit();
         for(int i=0;i<arrayList.size();i++)
         {
+            //Log.d("存入sharedpreference", "此时的arraylist数据为 "+arrayList.get(i));
             editor.putString(String.valueOf(i),arrayList.get(i));
+            editor.apply();
         }
+        SharedPreferences sharedPreferences=getSharedPreferences("urldata",MODE_PRIVATE);
+       // Log.d("sharepreference中的", " "+sharedPreferences.getString(String.valueOf(0),"0"));
     }
     public static File getFile(Context context)
     {
@@ -170,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(file.exists()) Log.d("getFile", "文件创建成功 ");
+      //  if(file.exists()) Log.d("getFile", "文件创建成功 ");
         return file;
     }
     public static boolean isGrantExternalRW(Activity activity) {
