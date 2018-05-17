@@ -3,6 +3,7 @@ package com.example.photowall;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -96,21 +97,15 @@ public class MainActivity extends AppCompatActivity {
              return false;
          }
     private void getPhoto(final Context context) {
-
+        Log.d("网络情况", "此时的网络连接情况是 "+isNetworkConnected(context));
+        if(isNetworkConnected(context)){
         Http http=new Http("http://gank.io/api/data/%E7%A6%8F%E5%88%A9/0/0");
         Log.d("getPhoto", "finish: 启动了getPhoto");
         http.sendRequestWithHttpURLConnection(new Http.Callback() {
             @Override
             public void finish(String respone) {
-                if(isNetworkConnected(context)){
-                    Log.d("finish", "网络连接成功 ");
+                 //   Log.d("finish", "网络连接成功 ");
                     parseJSON(respone);
-                }
-                else {
-                    Photos=getArrayList();
-                    Log.d("finish", "网络连接不成功 Photo");
-                    if(Photos.size()!=0) Log.d("nullHttp", "此时的Photos不为空 ");
-                }
               runOnUiThread(new Runnable() {
 
                     @Override
@@ -131,8 +126,13 @@ public class MainActivity extends AppCompatActivity {
                 });
 
             }
-
-        });
+            });
+        }
+        else {
+            Photos=getArrayList();
+            Log.d("finish", "网络连接不成功 Photo");
+            if(Photos.size()!=0) Log.d("nullHttp", "此时的Photos不为空 ");
+        }
         runOnUiThread(new Runnable() {
 
             @Override
@@ -143,38 +143,24 @@ public class MainActivity extends AppCompatActivity {
     }
     public List getArrayList()
     {
-        Log.d("getArrayList", "得到数组 ");
-        ObjectInputStream objectInputStream;
-        FileInputStream fileInputStream;
-         List<String>list =new ArrayList<>();
-        try {
-            fileInputStream=new FileInputStream(totalFile.toString());
-            objectInputStream=new ObjectInputStream(fileInputStream);
-            list= (List<String>) objectInputStream.readObject();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        Log.d("难受呀马飞", "得到数组方法启动 ");
+        List<String> list=new ArrayList<>();
+        SharedPreferences sharedPreferences=getSharedPreferences("urldata",MODE_PRIVATE);
+        for(int i=0;;i++)
+        {
+            if(sharedPreferences.getString(String.valueOf(i),"0")=="0")break;
+            list.add(sharedPreferences.getString(String.valueOf(i),"0"));
         }
         return list;
     }
     public void saveArrayList(List<String> arrayList)
     {
-        Log.d("saveArrayList", "保存数组 "+arrayList.size());
-        FileOutputStream fileOutputStream=null;
-        ObjectOutputStream objectOutputStream=null;
-        try {
-            fileOutputStream=new FileOutputStream(totalFile.toString());
-            objectOutputStream=new ObjectOutputStream(fileOutputStream);
-            objectOutputStream.writeObject(arrayList);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        Log.d("难受呀马飞", "saveArrayList:启动了 ");
+        SharedPreferences.Editor editor=getSharedPreferences("urldata",MODE_PRIVATE).edit();
+        for(int i=0;i<arrayList.size();i++)
+        {
+            editor.putString(String.valueOf(i),arrayList.get(i));
         }
-
     }
     public static File getFile(Context context)
     {
