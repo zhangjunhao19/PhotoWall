@@ -63,7 +63,7 @@ public class ImageLoader {
             LoaderResult result=(LoaderResult)msg.obj;
             ImageView imageView=result.imageView;
             imageView.setImageBitmap(result.bitmap);
-            String url=(String)imageView.getTag(TAG_KEY_URI);
+            String url=(String)imageView.getTag();
             if(url.equals(result.url)){
                 imageView.setImageBitmap(result.bitmap);
             }
@@ -158,7 +158,7 @@ public class ImageLoader {
 
     public void  bindBitmap(final String url,final ImageView imageView,final int reqWidth,final int reqHeight)
     {
-        imageView.setTag(TAG_KEY_URI,url);
+        imageView.setTag(url);
         Bitmap bitmap=loadBitmapFromMemCache(url);
         if(bitmap!=null){
             imageView.setImageBitmap(bitmap);
@@ -169,7 +169,7 @@ public class ImageLoader {
             public void run() {
                 Log.d(TAG, "进行了异步下载图片 ");
             Bitmap bitmap=loadBitmap(url,reqWidth,reqHeight);
-            if(bitmap!=null)
+            if(bitmap!=null&&imageView.getTag().equals(url))
             {
                 LoaderResult result=new LoaderResult(imageView,url,bitmap);
                 mMainHandler.obtainMessage(MESSAGE_RESULT,result).sendToTarget();

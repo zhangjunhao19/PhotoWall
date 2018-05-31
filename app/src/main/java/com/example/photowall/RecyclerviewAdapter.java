@@ -43,6 +43,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
     @Override
     public void onBindViewHolder(RecyclerviewAdapter.ViewHolder holder, final int position) {
         Log.d("onBindView", "onBindViewHolder:onbindview启动了 "+Photos.get(position));
+        holder.imageView.setImageResource(R.drawable.wait);
         imageLoader.bindBitmap(Photos.get(position),holder.imageView,holder.imageView.getWidth(),holder.itemView.getHeight());
         dialog=new Dialog(mContext);
         dialog.setContentView(R.layout.dialog);

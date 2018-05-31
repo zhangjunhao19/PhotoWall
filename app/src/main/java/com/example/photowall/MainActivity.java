@@ -194,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
    private void parseJSON(String respone) {
        try {
            JSONObject jsonObject=new JSONObject(respone);
+           Log.d("Json解析", "parseJSON: "+jsonObject.toString());
            String result=jsonObject.getString("results");
            JSONArray jsonArray=new JSONArray(result);
 
